@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.Kitchen
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -51,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -231,6 +233,7 @@ fun ShoppingList(modifier: Modifier = Modifier) {
     var expanded by remember {mutableStateOf(false)}
     //val extraPadding = if (expanded.value) 48.dp else 0.dp
     val users = listOf("Kasia", "Kamil", "Kuba")
+
     Surface(
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -258,7 +261,17 @@ fun ShoppingList(modifier: Modifier = Modifier) {
                 .padding(top = 75.dp, bottom = 20.dp)
                 .padding(horizontal = 25.dp)){
                     for(element in users) {
-                        Text(element, textAlign = TextAlign.Center, fontSize = 20.sp)
+                        val checkedState = remember { mutableStateOf(false) }
+                        var decor = TextDecoration.None
+                        Row(verticalAlignment = Alignment.CenterVertically){
+                            Checkbox(checked = checkedState.value, onCheckedChange = { checkedState.value = it })
+                            decor = if(checkedState.value){
+                                TextDecoration.LineThrough
+                            } else{
+                                TextDecoration.None
+                            }
+                            Text(element, textDecoration = decor, textAlign = TextAlign.Center, fontSize = 20.sp)
+                        }
                     }
                 }
             }
