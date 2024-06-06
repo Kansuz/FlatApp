@@ -7,7 +7,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+//import androidx.compose.foundation.layout.FlowRowScopeInstance.weight
 //import androidx.compose.foundation.layout.FlowRowScopeInstance.align
 //import androidx.compose.foundation.layout.FlowRowScopeInstance.weight
 import androidx.compose.foundation.layout.Row
@@ -25,10 +27,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bathroom
 import androidx.compose.material.icons.filled.Bathtub
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.CleaningServices
 import androidx.compose.material.icons.filled.Countertops
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Diversity3
 import androidx.compose.material.icons.filled.DoNotDisturbOn
@@ -38,6 +42,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.RestoreFromTrash
 import androidx.compose.material.icons.filled.Shower
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -47,6 +52,7 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,6 +70,7 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.ui.window.Dialog
 
 
 class MainActivity : ComponentActivity() {
@@ -78,24 +85,14 @@ class MainActivity : ComponentActivity() {
             else {
                 FlatAppLandscape()
             }
-//            val windowSizeClass = calculateWindowSizeClass(this)
-//            FlatApp(windowSizeClass)
-//            FlatAppTheme {
-//                FlatApp(modifier = Modifier.fillMaxSize())}
-
-                // A surface container using the 'background' color from the theme
-//                Surface(
-//                    modifier = Modifier.fillMaxSize(),
-//                    color = MaterialTheme.colorScheme.background
-//                ) {
-//                    Greeting("Android")
-//                }
         }
     }
 }
 
 @Composable
 private fun UpperBar(modifier: Modifier = Modifier) {
+    val showFriends =  remember {mutableStateOf(false)}
+
     NavigationBar(
         modifier = modifier,
         containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -104,7 +101,10 @@ private fun UpperBar(modifier: Modifier = Modifier) {
             icon = {
                 Icon(
                     imageVector = Icons.Default.Diversity3,
-                    contentDescription = null
+                    contentDescription = null,
+                    modifier = Modifier.clickable{
+                        showFriends.value = !showFriends.value
+                    }
                 )
             },
             selected = false,
@@ -122,40 +122,19 @@ private fun UpperBar(modifier: Modifier = Modifier) {
             onClick = {}
         )
     }
-}
 
-@Composable
-private fun UpperBarHorizontal(modifier: Modifier = Modifier) {
-    NavigationBar(
-        modifier = modifier,
-        //containerColor = MaterialTheme.colorScheme.surfaceVariant
-    ){
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Diversity3,
-                    contentDescription = null
-                )
-            },
-            selected = false,
-            onClick = {}
-        )
-        Spacer(modifier = Modifier.width(150.dp))
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = null
-                )
-            },
-            selected = false,
-            onClick = {}
-        )
+    if (showFriends.value){
+        Dialog(onDismissRequest = { showFriends.value = false}){
+            Box {
+                FriendList()
+            }
+        }
     }
 }
 
 @Composable
 private fun BottomNavigation(modifier: Modifier = Modifier) {
+
     NavigationBar(
         modifier = modifier,
         containerColor =  MaterialTheme.colorScheme.surfaceVariant
@@ -225,6 +204,8 @@ private fun BottomNavigation(modifier: Modifier = Modifier) {
 
 @Composable
 private fun BottomNavigationHorizontal(modifier: Modifier = Modifier) {
+    val showFriends =  remember {mutableStateOf(false)}
+
     NavigationRail(
         modifier = modifier
             .padding(start = 8.dp, end = 8.dp)
@@ -304,7 +285,10 @@ private fun BottomNavigationHorizontal(modifier: Modifier = Modifier) {
                 icon = {
                     Icon (
                         imageVector = Icons.Default.Diversity3,
-                        contentDescription = null
+                        contentDescription = null,
+                        modifier = Modifier.clickable{
+                            showFriends.value = !showFriends.value
+                        }
                     )
                 },
                 label = {
@@ -333,12 +317,15 @@ private fun BottomNavigationHorizontal(modifier: Modifier = Modifier) {
             )
         }
     }
+
+    if (showFriends.value){
+        Dialog(onDismissRequest = { showFriends.value = false}){
+            Box {
+                FriendList()
+            }
+        }
+    }
 }
-//@Composable
-//fun FlatApp(
-//    modifier: WindowSizeClass = Modifier) {
-//    FlatAppPortrait()
-//}
 
 @Composable
 fun MyChores(modifier: Modifier = Modifier) {
@@ -376,7 +363,7 @@ fun MyChores(modifier: Modifier = Modifier) {
 //chores:
 //imageVector = Icons.Default.Countertops -> Kitchen
 //imageVector = Icons.Default.Bathtub -> Bathroom
-//imageVector = Icons.Default.DeleteSweep -> Trash
+//imageVector = Icons.Default.Delete -> Trash
 //imageVector = Icons.Default.CleaningServices -> Floor
 
 @Composable
@@ -430,11 +417,59 @@ fun ShoppingList(modifier: Modifier = Modifier) {
     }
 
 @Composable
+fun FriendList(modifier: Modifier = Modifier){
+    val users = listOf("Alex", "Kuba", "Kamila")
+    val icons = listOf(Icons.Default.Countertops, Icons.Default.Bathtub,
+        Icons.Default.Delete, Icons.Default.CleaningServices )
+
+    Surface(
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        modifier = modifier
+            .padding(vertical = 8.dp, horizontal = 8.dp))
+    {
+        LazyColumn(){
+            for(element in users){
+                item{
+                    Row(
+                        modifier = Modifier.padding(24.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        Icon(
+                            //modifier = Modifier.size(55.dp),
+                            imageVector = Icons.Default.DoNotDisturbOn,
+                            contentDescription = null
+                        )
+                        Spacer(Modifier.width(10.dp))
+
+                        Text(modifier = Modifier
+                            .weight(1f),
+                            text = element,
+                            style = MaterialTheme.typography.titleLarge)
+
+                        Column(modifier = Modifier,
+                            //.padding(bottom = extraPadding),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ){
+                            Icon(
+                                modifier = Modifier.size(40.dp),
+                                imageVector = Icons.Default.Bathtub,
+                                contentDescription = null
+                            )
+                            Text(
+                                text = "Bathroom",
+                                style = MaterialTheme.typography.titleMedium)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
     LazyColumn(modifier = modifier){
-//        item{
-//            UpperBar()
-//        }
         item{
             Spacer(Modifier.height(16.dp))
             MyChores()
@@ -461,39 +496,32 @@ fun FlatAppPortrait() {
 @Composable
 fun FlatAppLandscape(){
     FlatAppTheme {
-//        Scaffold(
-//            //topBar = { UpperBar()},
-//            bottomBar = { BottomNavigation() }
-//        ) { padding ->
-//            HomeScreen(Modifier.padding(padding))
-//        }
         Surface (color = MaterialTheme.colorScheme.background){
             Row(modifier = Modifier.fillMaxSize()){
-                //UpperBar()
                 BottomNavigationHorizontal()
                 HomeScreen(modifier = Modifier.fillMaxSize())
-//              Text("test", modifier = Modifier.fillMaxSize(), textAlign = TextAlign.Center)
             }
         }
     }
 }
-@Composable
-fun FlatApp(windowSize: WindowSizeClass) {
-    when(windowSize.widthSizeClass){
-        WindowWidthSizeClass.Compact -> {
-            FlatAppPortrait()
-        }
-        WindowWidthSizeClass.Expanded -> {
-            FlatAppLandscape()
-        }
-        WindowWidthSizeClass.Medium -> {
 
-        }
-        else ->{
-            Text("Neither compact nor expanded!", modifier = Modifier.fillMaxSize(), textAlign = TextAlign.Center)
-        }
-    }
-}
+//@Composable
+//fun FlatApp(windowSize: WindowSizeClass) {
+//    when(windowSize.widthSizeClass){
+//        WindowWidthSizeClass.Compact -> {
+//            FlatAppPortrait()
+//        }
+//        WindowWidthSizeClass.Expanded -> {
+//            FlatAppLandscape()
+//        }
+//        WindowWidthSizeClass.Medium -> {
+//
+//        }
+//        else ->{
+//            Text("Neither compact nor expanded!", modifier = Modifier.fillMaxSize(), textAlign = TextAlign.Center)
+//        }
+//    }
+//}
 
 @Preview(showBackground = true, widthDp = 320)
 @Composable
@@ -513,12 +541,6 @@ fun UpperBarPreview(){
     FlatAppTheme {UpperBar(Modifier.padding(bottom = 24.dp)) }
 }
 
-@Preview (showBackground = true, backgroundColor = 0xFFF5F0EE)
-@Composable
-fun UpperBarHorizontalPreview(){
-    FlatAppTheme {UpperBarHorizontal(Modifier.padding(bottom = 24.dp))}
-}
-
 @Preview(showBackground = true, backgroundColor = 0xFFF5F0EE)
 @Composable
 fun BottomNavigationPreview() {
@@ -529,6 +551,12 @@ fun BottomNavigationPreview() {
 @Composable
 fun BottomNavigationHorizontalPreview() {
     FlatAppTheme { BottomNavigationHorizontal() }
+}
+
+@Preview
+@Composable
+fun FriendListPreview(){
+    FriendList()
 }
 
 @Preview(widthDp = 360, heightDp = 640)

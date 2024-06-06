@@ -221,6 +221,7 @@ fun LoginScreen(navController: NavController){
                 style = MaterialTheme.typography.headlineMedium
             )
             TextField(labelValue = "Email", imageVector = Icons.Default.Email)
+            Spacer(modifier = Modifier.height(5.dp))
             PasswordField(labelValue = "Password", imageVector = Icons.Default.Lock)
             ButtonComponent(value = "Login")
             Spacer(modifier = Modifier.height(10.dp))
@@ -246,7 +247,9 @@ fun RegistrationScreen(navController: NavController){
                 style = MaterialTheme.typography.headlineMedium
             )
             TextField(labelValue = "Name", imageVector = Icons.Default.Person)
+            Spacer(modifier = Modifier.height(5.dp))
             TextField(labelValue = "Email", imageVector = Icons.Default.Email)
+            Spacer(modifier = Modifier.height(5.dp))
             PasswordField(labelValue = "Password", imageVector = Icons.Default.Lock)
             ButtonComponent(value = "Create")
             Spacer(modifier = Modifier.height(10.dp))
@@ -275,6 +278,7 @@ fun LoginScreenHorizontal(navController: NavController){
                     style = MaterialTheme.typography.headlineMedium
                 )
                 TextField(labelValue = "Email", imageVector = Icons.Default.Email)
+                Spacer(modifier = Modifier.height(5.dp))
                 PasswordField(labelValue = "Password", imageVector = Icons.Default.Lock)
                 ButtonComponent(value = "Login")
                 Spacer(modifier = Modifier.height(10.dp))
@@ -302,7 +306,9 @@ fun RegistrationScreenHorizontal(navController: NavController){
                     style = MaterialTheme.typography.headlineMedium
                 )
                 TextField(labelValue = "Name", imageVector = Icons.Default.Person)
+                Spacer(modifier = Modifier.height(5.dp))
                 TextField(labelValue = "Email", imageVector = Icons.Default.Email)
+                Spacer(modifier = Modifier.height(5.dp))
                 PasswordField(labelValue = "Password", imageVector = Icons.Default.Lock)
                 ButtonComponent(value = "Create")
                 Spacer(modifier = Modifier.height(10.dp))
