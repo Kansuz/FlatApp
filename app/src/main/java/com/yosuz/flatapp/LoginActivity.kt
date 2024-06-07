@@ -245,7 +245,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
                 onTextSelected = {
                     loginViewModel.onEvent(UIEvent.PasswordChanged(it))
                 })
-            ButtonComponent(value = "Login", onButtonClicked = {})
+            ButtonComponent(value = "Login", onButtonClicked = {loginViewModel.onEvent(UIEvent.RegisterButtonClicked)})
             Spacer(modifier = Modifier.height(10.dp))
             ClickableTextComponent("Don't have an account yet? ", "Register", navController, "registration_screen")
         }
@@ -285,7 +285,7 @@ fun RegistrationScreen(navController: NavController, loginViewModel: LoginViewMo
                 onTextSelected = {
                     loginViewModel.onEvent(UIEvent.PasswordChanged(it))
                 })
-            ButtonComponent(value = "Create", onButtonClicked = {})
+            ButtonComponent(value = "Create", onButtonClicked = {loginViewModel.onEvent(UIEvent.RegisterButtonClicked)})
             Spacer(modifier = Modifier.height(10.dp))
             ClickableTextComponent("Already have an account? ", "Login", navController, "login_screen")
         }
@@ -322,7 +322,7 @@ fun LoginScreenHorizontal(navController: NavController, loginViewModel: LoginVie
                     onTextSelected = {
                         loginViewModel.onEvent(UIEvent.PasswordChanged(it))
                     })
-                //ButtonComponent(value = "Login", onButtonClicked = {loginViewModel.onEvent})
+                ButtonComponent(value = "Login", onButtonClicked = {loginViewModel.onEvent(UIEvent.RegisterButtonClicked)})
                 Spacer(modifier = Modifier.height(10.dp))
                 ClickableTextComponent("Don't have an account yet? ", "Register", navController,"registration_screen_horizontal")
             }
@@ -362,7 +362,7 @@ fun RegistrationScreenHorizontal(navController: NavController, loginViewModel: L
                     onTextSelected = {
                         loginViewModel.onEvent(UIEvent.PasswordChanged(it))
                     })
-                //ButtonComponent(value = "Create")
+                ButtonComponent(value = "Create", onButtonClicked = {loginViewModel.onEvent(UIEvent.RegisterButtonClicked)})
                 Spacer(modifier = Modifier.height(10.dp))
                 ClickableTextComponent("Already have an account? ", "Login", navController, "login_screen_horizontal")
             }
