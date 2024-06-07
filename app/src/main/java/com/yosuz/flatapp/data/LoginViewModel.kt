@@ -7,6 +7,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.yosuz.flatapp.data.rules.Validator
+import com.yosuz.flatapp.navigation.FlatAppRouter
+import com.yosuz.flatapp.navigation.Screen
 
 class LoginViewModel : ViewModel() {
 
@@ -89,9 +91,9 @@ class LoginViewModel : ViewModel() {
                 Log.d(TAG, "Inside_OnCompleteListener")
                 Log.d(TAG, "isSuccessful = ${it.isSuccessful}")
 
-//                if(it.isSuccessful){
-//                    navController.navigate(screen)
-//                }
+                if(it.isSuccessful){
+                    FlatAppRouter.navigateTo(Screen.HomeScreen)
+                }
             }
             .addOnFailureListener {
                 Log.d(TAG, "Inside_OnFailureListener")

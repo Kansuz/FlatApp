@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -73,6 +74,8 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.yosuz.flatapp.navigation.FlatAppRouter
+import com.yosuz.flatapp.navigation.Screen
 
 
 class MainActivity : ComponentActivity() {
@@ -81,12 +84,39 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val orientation = this.resources.configuration.orientation
+            var orientationPortrait = true
+
             if (orientation == Configuration.ORIENTATION_PORTRAIT){
-                FlatAppPortrait()
+                orientationPortrait = true
+            } else {
+                orientationPortrait = false
             }
-            else {
-                FlatAppLandscape()
+
+            Crossfade(targetState = FlatAppRouter.currentScreen){ currentState ->
+                when(currentState.value){
+                    is Screen.LoginScreen -> {
+                        if(orientationPortrait){
+                            FirstScreen()
+                        } else {
+                            FirstScreenHorizontal()
+                        }
+                    }
+                    is Screen.HomeScreen -> {
+                        if(orientationPortrait){
+                            FlatAppPortrait()
+                        } else {
+                            FlatAppLandscape()
+                        }
+
+                    }
+                }
             }
+//            if (orientation == Configuration.ORIENTATION_PORTRAIT){
+//                FlatAppPortrait()
+//            }
+//            else {
+//                FlatAppLandscape()
+//            }
         }
     }
 }
