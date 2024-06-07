@@ -71,10 +71,13 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.yosuz.flatapp.data.LoginViewModel
+import com.yosuz.flatapp.data.UIEvent
 
 class LoginActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
@@ -92,15 +95,16 @@ class LoginActivity : ComponentActivity() {
 }
 
 @Composable
-fun ButtonComponent(value: String){
+fun ButtonComponent(value: String, onButtonClicked: () -> Unit){
     Button(
-        onClick = {},
+        onClick = {onButtonClicked.invoke()},
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 20.dp)
             .heightIn(48.dp),
         contentPadding = PaddingValues(),
         colors = ButtonDefaults.buttonColors(Color.Transparent)
+        //enabled = isEnabled
     ){
         Box(modifier = Modifier
             .fillMaxWidth()
@@ -122,8 +126,10 @@ fun ButtonComponent(value: String){
 }
 @Composable
 fun TextField(labelValue: String,
-              imageVector: ImageVector){
+              imageVector: ImageVector,
+              onTextSelected: (String) -> Unit){
     val textValue = remember { mutableStateOf("") }
+    val localFocusManager = LocalFocusManager.current
 
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
@@ -133,10 +139,14 @@ fun TextField(labelValue: String,
 //            focusedLabelColor = MaterialTheme.colorScheme.primary,
 //            cursorColor = MaterialTheme.colorScheme.primary
 //        ),
-        keyboardOptions = KeyboardOptions.Default,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+        singleLine = true,
+        keyboardActions = KeyboardActions{localFocusManager.clearFocus()},
+        maxLines = 1,
         value = textValue.value,
         onValueChange = {
             textValue.value = it
+            onTextSelected(it)
         },
         leadingIcon = {
             Icon(
@@ -147,7 +157,8 @@ fun TextField(labelValue: String,
 }
 @Composable
 fun PasswordField(labelValue: String,
-              imageVector: ImageVector){
+                  imageVector: ImageVector,
+                  onTextSelected: (String) -> Unit){
     val passwordValue = remember { mutableStateOf("") }
     val passwordVisible = remember { mutableStateOf(false) }
 
@@ -159,10 +170,13 @@ fun PasswordField(labelValue: String,
 //            focusedLabelColor = MaterialTheme.colorScheme.primary,
 //            cursorColor = MaterialTheme.colorScheme.primary
 //        ),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+        singleLine = true,
+        maxLines = 1,
         value = passwordValue.value,
         onValueChange = {
             passwordValue.value = it
+            onTextSelected(it)
         },
         leadingIcon = {
             Icon(
@@ -204,7 +218,7 @@ fun ClickableTextComponent(initialText: String, clickableText: String, navContro
 
 }
 @Composable
-fun LoginScreen(navController: NavController){
+fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = viewModel()){
     Surface(modifier = Modifier
         .fillMaxSize()
         .background(Color.White)){
@@ -220,17 +234,25 @@ fun LoginScreen(navController: NavController){
                 text = "Login to FlatApp",
                 style = MaterialTheme.typography.headlineMedium
             )
-            TextField(labelValue = "Email", imageVector = Icons.Default.Email)
+            TextField(labelValue = "Email",
+                imageVector = Icons.Default.Email,
+                onTextSelected = {
+                    loginViewModel.onEvent(UIEvent.EmailChanged(it))
+                })
             Spacer(modifier = Modifier.height(5.dp))
-            PasswordField(labelValue = "Password", imageVector = Icons.Default.Lock)
-            ButtonComponent(value = "Login")
+            PasswordField(labelValue = "Password",
+                imageVector = Icons.Default.Lock,
+                onTextSelected = {
+                    loginViewModel.onEvent(UIEvent.PasswordChanged(it))
+                })
+            ButtonComponent(value = "Login", onButtonClicked = {})
             Spacer(modifier = Modifier.height(10.dp))
             ClickableTextComponent("Don't have an account yet? ", "Register", navController, "registration_screen")
         }
     }
 }
 @Composable
-fun RegistrationScreen(navController: NavController){
+fun RegistrationScreen(navController: NavController, loginViewModel: LoginViewModel = viewModel()){
     Surface(modifier = Modifier
         .fillMaxSize()
         .background(Color.White)){
@@ -246,12 +268,24 @@ fun RegistrationScreen(navController: NavController){
                 text = "Create an Account",
                 style = MaterialTheme.typography.headlineMedium
             )
-            TextField(labelValue = "Name", imageVector = Icons.Default.Person)
+            TextField(labelValue = "Name",
+                imageVector = Icons.Default.Person,
+                onTextSelected = {
+                    loginViewModel.onEvent(UIEvent.NameChanged(it))
+                })
             Spacer(modifier = Modifier.height(5.dp))
-            TextField(labelValue = "Email", imageVector = Icons.Default.Email)
+            TextField(labelValue = "Email",
+                imageVector = Icons.Default.Email,
+                onTextSelected = {
+                    loginViewModel.onEvent(UIEvent.EmailChanged(it))
+                })
             Spacer(modifier = Modifier.height(5.dp))
-            PasswordField(labelValue = "Password", imageVector = Icons.Default.Lock)
-            ButtonComponent(value = "Create")
+            PasswordField(labelValue = "Password",
+                imageVector = Icons.Default.Lock,
+                onTextSelected = {
+                    loginViewModel.onEvent(UIEvent.PasswordChanged(it))
+                })
+            ButtonComponent(value = "Create", onButtonClicked = {})
             Spacer(modifier = Modifier.height(10.dp))
             ClickableTextComponent("Already have an account? ", "Login", navController, "login_screen")
         }
@@ -259,7 +293,7 @@ fun RegistrationScreen(navController: NavController){
 }
 
 @Composable
-fun LoginScreenHorizontal(navController: NavController){
+fun LoginScreenHorizontal(navController: NavController, loginViewModel: LoginViewModel = viewModel()){
     Surface(modifier = Modifier
         .fillMaxSize()
         .background(Color.White)){
@@ -277,10 +311,18 @@ fun LoginScreenHorizontal(navController: NavController){
                     text = "Login to FlatApp",
                     style = MaterialTheme.typography.headlineMedium
                 )
-                TextField(labelValue = "Email", imageVector = Icons.Default.Email)
+                TextField(labelValue = "Email",
+                    imageVector = Icons.Default.Email,
+                    onTextSelected = {
+                        loginViewModel.onEvent(UIEvent.EmailChanged(it))
+                    })
                 Spacer(modifier = Modifier.height(5.dp))
-                PasswordField(labelValue = "Password", imageVector = Icons.Default.Lock)
-                ButtonComponent(value = "Login")
+                PasswordField(labelValue = "Password",
+                    imageVector = Icons.Default.Lock,
+                    onTextSelected = {
+                        loginViewModel.onEvent(UIEvent.PasswordChanged(it))
+                    })
+                //ButtonComponent(value = "Login", onButtonClicked = {loginViewModel.onEvent})
                 Spacer(modifier = Modifier.height(10.dp))
                 ClickableTextComponent("Don't have an account yet? ", "Register", navController,"registration_screen_horizontal")
             }
@@ -288,7 +330,7 @@ fun LoginScreenHorizontal(navController: NavController){
     }
 }
 @Composable
-fun RegistrationScreenHorizontal(navController: NavController){
+fun RegistrationScreenHorizontal(navController: NavController, loginViewModel: LoginViewModel = viewModel()){
     Surface(modifier = Modifier
         .fillMaxSize()
         .background(Color.White)){
@@ -305,12 +347,22 @@ fun RegistrationScreenHorizontal(navController: NavController){
                     text = "Create an Account",
                     style = MaterialTheme.typography.headlineMedium
                 )
-                TextField(labelValue = "Name", imageVector = Icons.Default.Person)
+                TextField(labelValue = "Name",
+                    imageVector = Icons.Default.Person,
+                    onTextSelected = {loginViewModel.onEvent(UIEvent.NameChanged(it))})
                 Spacer(modifier = Modifier.height(5.dp))
-                TextField(labelValue = "Email", imageVector = Icons.Default.Email)
+                TextField(labelValue = "Email",
+                    imageVector = Icons.Default.Email,
+                    onTextSelected = {
+                        loginViewModel.onEvent(UIEvent.EmailChanged(it))
+                    })
                 Spacer(modifier = Modifier.height(5.dp))
-                PasswordField(labelValue = "Password", imageVector = Icons.Default.Lock)
-                ButtonComponent(value = "Create")
+                PasswordField(labelValue = "Password",
+                    imageVector = Icons.Default.Lock,
+                    onTextSelected = {
+                        loginViewModel.onEvent(UIEvent.PasswordChanged(it))
+                    })
+                //ButtonComponent(value = "Create")
                 Spacer(modifier = Modifier.height(10.dp))
                 ClickableTextComponent("Already have an account? ", "Login", navController, "login_screen_horizontal")
             }
