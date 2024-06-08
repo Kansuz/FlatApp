@@ -2,14 +2,9 @@ package com.yosuz.flatapp
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,43 +24,30 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
-import com.yosuz.flatapp.ui.theme.FlatAppTheme
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.LockOpen
-import androidx.compose.material.icons.filled.MyLocation
-import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PersonOutline
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.TextField
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Button
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -76,8 +58,10 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.yosuz.flatapp.data.LoginUIEvent
 import com.yosuz.flatapp.data.LoginViewModel
-import com.yosuz.flatapp.data.UIEvent
+import com.yosuz.flatapp.data.SignupViewModel
+import com.yosuz.flatapp.data.SignupUIEvent
 
 class LoginActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
@@ -241,18 +225,18 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
             TextField(labelValue = "Email",
                 imageVector = Icons.Default.Email,
                 onTextSelected = {
-                    loginViewModel.onEvent(UIEvent.EmailChanged(it))
+                    loginViewModel.onEvent(LoginUIEvent.EmailChanged(it))
                 },
-                loginViewModel.registrationUIState.value.emailError)
+                errorStatus = loginViewModel.loginUIState.value.emailError)
             Spacer(modifier = Modifier.height(5.dp))
             PasswordField(labelValue = "Password",
                 imageVector = Icons.Default.Lock,
                 onTextSelected = {
-                    loginViewModel.onEvent(UIEvent.PasswordChanged(it))
+                    loginViewModel.onEvent(LoginUIEvent.PasswordChanged(it))
                 },
-                loginViewModel.registrationUIState.value.passwordError)
+                errorStatus = loginViewModel.loginUIState.value.passwordError)
             ButtonComponent(value = "Login",
-                onButtonClicked = {loginViewModel.onEvent(UIEvent.RegisterButtonClicked)},
+                onButtonClicked = {loginViewModel.onEvent(LoginUIEvent.LoginButtonClicked)},
                 isEnabled = loginViewModel.allValidationsPassed.value)
             Spacer(modifier = Modifier.height(10.dp))
             ClickableTextComponent("Don't have an account yet? ", "Register", navController, "registration_screen")
@@ -260,7 +244,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
     }
 }
 @Composable
-fun RegistrationScreen(navController: NavController, loginViewModel: LoginViewModel = viewModel()){
+fun RegistrationScreen(navController: NavController, signupViewModel: SignupViewModel = viewModel()){
     Surface(modifier = Modifier
         .fillMaxSize()
         .background(Color.White)){
@@ -279,26 +263,26 @@ fun RegistrationScreen(navController: NavController, loginViewModel: LoginViewMo
             TextField(labelValue = "Name",
                 imageVector = Icons.Default.Person,
                 onTextSelected = {
-                    loginViewModel.onEvent(UIEvent.NameChanged(it))
+                    signupViewModel.onEvent(SignupUIEvent.NameChanged(it))
                 },
-                loginViewModel.registrationUIState.value.nameError)
+                signupViewModel.registrationUIState.value.nameError)
             Spacer(modifier = Modifier.height(5.dp))
             TextField(labelValue = "Email",
                 imageVector = Icons.Default.Email,
                 onTextSelected = {
-                    loginViewModel.onEvent(UIEvent.EmailChanged(it))
+                    signupViewModel.onEvent(SignupUIEvent.EmailChanged(it))
                 },
-                loginViewModel.registrationUIState.value.emailError)
+                signupViewModel.registrationUIState.value.emailError)
             Spacer(modifier = Modifier.height(5.dp))
             PasswordField(labelValue = "Password",
                 imageVector = Icons.Default.Lock,
                 onTextSelected = {
-                    loginViewModel.onEvent(UIEvent.PasswordChanged(it))
+                    signupViewModel.onEvent(SignupUIEvent.PasswordChanged(it))
                 },
-                loginViewModel.registrationUIState.value.passwordError)
+                errorStatus = signupViewModel.registrationUIState.value.passwordError)
             ButtonComponent(value = "Create",
-                onButtonClicked = {loginViewModel.onEvent(UIEvent.RegisterButtonClicked)},
-                isEnabled = loginViewModel.allValidationsPassed.value)
+                onButtonClicked = {signupViewModel.onEvent(SignupUIEvent.RegisterButtonClicked)},
+                isEnabled = signupViewModel.allValidationsPassed.value)
             Spacer(modifier = Modifier.height(10.dp))
             ClickableTextComponent("Already have an account? ", "Login", navController, "login_screen")
         }
@@ -327,18 +311,18 @@ fun LoginScreenHorizontal(navController: NavController, loginViewModel: LoginVie
                 TextField(labelValue = "Email",
                     imageVector = Icons.Default.Email,
                     onTextSelected = {
-                        loginViewModel.onEvent(UIEvent.EmailChanged(it))
+                        loginViewModel.onEvent(LoginUIEvent.EmailChanged(it))
                     },
-                    loginViewModel.registrationUIState.value.emailError)
+                    errorStatus = loginViewModel.loginUIState.value.emailError)
                 Spacer(modifier = Modifier.height(5.dp))
                 PasswordField(labelValue = "Password",
                     imageVector = Icons.Default.Lock,
                     onTextSelected = {
-                        loginViewModel.onEvent(UIEvent.PasswordChanged(it))
+                        loginViewModel.onEvent(LoginUIEvent.PasswordChanged(it))
                     },
-                    loginViewModel.registrationUIState.value.passwordError)
+                    loginViewModel.loginUIState.value.passwordError)
                 ButtonComponent(value = "Login",
-                    onButtonClicked = {loginViewModel.onEvent(UIEvent.RegisterButtonClicked)},
+                    onButtonClicked = {loginViewModel.onEvent(LoginUIEvent.LoginButtonClicked)},
                     isEnabled = loginViewModel.allValidationsPassed.value)
                 Spacer(modifier = Modifier.height(10.dp))
                 ClickableTextComponent("Don't have an account yet? ", "Register", navController,"registration_screen_horizontal")
@@ -347,7 +331,7 @@ fun LoginScreenHorizontal(navController: NavController, loginViewModel: LoginVie
     }
 }
 @Composable
-fun RegistrationScreenHorizontal(navController: NavController, loginViewModel: LoginViewModel = viewModel()){
+fun RegistrationScreenHorizontal(navController: NavController, signupViewModel: SignupViewModel = viewModel()){
     Surface(modifier = Modifier
         .fillMaxSize()
         .background(Color.White)){
@@ -367,27 +351,27 @@ fun RegistrationScreenHorizontal(navController: NavController, loginViewModel: L
                 TextField(labelValue = "Name",
                     imageVector = Icons.Default.Person,
                     onTextSelected = {
-                        loginViewModel.onEvent(UIEvent.NameChanged(it))
+                        signupViewModel.onEvent(SignupUIEvent.NameChanged(it))
                     },
-                    loginViewModel.registrationUIState.value.nameError
+                    signupViewModel.registrationUIState.value.nameError
                 )
                 Spacer(modifier = Modifier.height(5.dp))
                 TextField(labelValue = "Email",
                     imageVector = Icons.Default.Email,
                     onTextSelected = {
-                        loginViewModel.onEvent(UIEvent.EmailChanged(it))
+                        signupViewModel.onEvent(SignupUIEvent.EmailChanged(it))
                     },
-                    loginViewModel.registrationUIState.value.emailError)
+                    signupViewModel.registrationUIState.value.emailError)
                 Spacer(modifier = Modifier.height(5.dp))
                 PasswordField(labelValue = "Password",
                     imageVector = Icons.Default.Lock,
                     onTextSelected = {
-                        loginViewModel.onEvent(UIEvent.PasswordChanged(it))
+                        signupViewModel.onEvent(SignupUIEvent.PasswordChanged(it))
                     },
-                    loginViewModel.registrationUIState.value.passwordError)
+                    signupViewModel.registrationUIState.value.passwordError)
                 ButtonComponent(value = "Create",
-                    onButtonClicked = {loginViewModel.onEvent(UIEvent.RegisterButtonClicked)},
-                    isEnabled = loginViewModel.allValidationsPassed.value)
+                    onButtonClicked = {signupViewModel.onEvent(SignupUIEvent.RegisterButtonClicked)},
+                    isEnabled = signupViewModel.allValidationsPassed.value)
                 Spacer(modifier = Modifier.height(10.dp))
                 ClickableTextComponent("Already have an account? ", "Login", navController, "login_screen_horizontal")
             }
