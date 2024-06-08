@@ -5,9 +5,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import com.yosuz.flatapp.based.User
 import com.yosuz.flatapp.data.rules.Validator
 import com.yosuz.flatapp.navigation.FlatAppRouter
 import com.yosuz.flatapp.navigation.Screen
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class SignupViewModel : ViewModel() {
 
@@ -52,6 +57,7 @@ class SignupViewModel : ViewModel() {
             email = registrationUIState.value.email,
             password = registrationUIState.value.password
         )
+
     }
 
     private fun validateDataWitRules() {
@@ -82,6 +88,8 @@ class SignupViewModel : ViewModel() {
         Log.d(TAG, registrationUIState.value.toString())
     }
 
+
+
     private fun createUserInFirebase(email: String, password: String){
         FirebaseAuth
             .getInstance()
@@ -91,7 +99,44 @@ class SignupViewModel : ViewModel() {
                 Log.d(TAG, "isSuccessful = ${it.isSuccessful}")
 
                 if(it.isSuccessful){
-                    FlatAppRouter.navigateTo(Screen.HomeScreen)
+
+
+                    val auth = FirebaseAuth.getInstance()
+                    val database = Firebase.database.reference
+                    val getChore = database.child("chores-count").get().addOnCompleteListener()
+                    {
+                        if(it.isSuccessful)
+                        {
+                            val today = LocalDate.now()
+                            database.child("current-date").setValue(today.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")).toString())
+                            val chore: Int = it.result.value.toString().toInt()
+                            Log.i("firebase","${it.result.value}")
+                            val usr = User(registrationUIState.value.name,registrationUIState.value.email,auth.currentUser!!.uid,0,chore)
+                            val reference = database.child("users").child(usr.uid.toString())
+                            reference.setValue(usr).addOnCompleteListener {
+                                if(it.isSuccessful)
+                                {
+                                    if(chore+1<4)
+                                    {
+                                        database.child("chores-count").setValue(chore+1)
+                                    }
+                                    else
+                                    {
+                                        database.child("chores-count").setValue(0)
+                                    }
+                                    Log.i("firebase","UwU ${usr.uid.toString()}")
+                                    FlatAppRouter.navigateTo(Screen.HomeScreen)
+
+                                }
+                                else
+                                {
+                                    Log.e("firebase","Failed to add")
+                                }
+
+                            }
+
+                        }
+                    }
                 }
             }
             .addOnFailureListener {

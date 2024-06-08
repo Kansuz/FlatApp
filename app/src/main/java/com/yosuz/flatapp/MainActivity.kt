@@ -2,6 +2,7 @@ package com.yosuz.flatapp
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.Crossfade
@@ -25,11 +26,15 @@ import com.yosuz.flatapp.navigation.FlatAppRouter
 import com.yosuz.flatapp.navigation.Screen
 import com.yosuz.flatapp.components.HomeScreen
 import com.yosuz.flatapp.components.UpperBar
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContent {
             val orientation = this.resources.configuration.orientation

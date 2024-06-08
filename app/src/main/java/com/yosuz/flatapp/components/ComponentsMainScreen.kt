@@ -1,5 +1,6 @@
 package com.yosuz.flatapp.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -57,6 +58,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.GenericTypeIndicator
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.yosuz.flatapp.data.SignupViewModel
 import com.yosuz.flatapp.data.RegistrationUIState
 import com.yosuz.flatapp.navigation.FlatAppRouter
@@ -356,11 +364,15 @@ fun MyChores(modifier: Modifier = Modifier) {
 //imageVector = Icons.Default.Delete -> Trash
 //imageVector = Icons.Default.CleaningServices -> Floor
 
+
+
 @Composable
 fun ShoppingList(modifier: Modifier = Modifier) {
     var expanded by remember { mutableStateOf(false) }
+
+
     //val extraPadding = if (expanded.value) 48.dp else 0.dp
-    val users = listOf("Szampon", "Chleb", "Sok")
+    //val users = listOf("Szampon", "Chleb", "Sok")
 
     Surface(
         shape = MaterialTheme.shapes.medium,
@@ -372,33 +384,68 @@ fun ShoppingList(modifier: Modifier = Modifier) {
         Row(
             modifier = Modifier.padding(24.dp),
             verticalAlignment = Alignment.CenterVertically
-        ){
-            Text(modifier = Modifier
-                .weight(1f),
+        ) {
+            Text(
+                modifier = Modifier
+                    .weight(1f),
                 text = "Shopping List",
-                style = MaterialTheme.typography.titleLarge)
+                style = MaterialTheme.typography.titleLarge
+            )
             Icon(
                 modifier = Modifier.size(55.dp),
                 imageVector = Icons.Default.Checklist,
                 contentDescription = null
             )
         }
-        if(expanded){
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 75.dp, bottom = 20.dp)
-                .padding(horizontal = 25.dp)){
-                for(element in users) {
-                    val checkedState = remember { mutableStateOf(false) }
+        if (expanded) {
+            val items = remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
+
+            val db = Firebase.database.reference
+
+            val ref = db.child("shopping-list")
+
+            ref.addValueEventListener(object : ValueEventListener {
+
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    val data = dataSnapshot.getValue(object :
+                        GenericTypeIndicator<Map<String, Boolean>>() {})
+                    if (data != null) {
+                        items.value = data
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("Error", "Error $error")
+                }
+
+
+            })
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 75.dp, bottom = 20.dp)
+                    .padding(horizontal = 25.dp)
+            ) {
+                for ((key, value) in items.value) {
+                    //Text(text = "$key: $value", fontSize = 20.sp)
+//                    val checkedState = remember { mutableStateOf(false) }
                     var decor = TextDecoration.None
-                    Row(verticalAlignment = Alignment.CenterVertically){
-                        Checkbox(checked = checkedState.value, onCheckedChange = { checkedState.value = it })
-                        decor = if(checkedState.value){
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(
+                            checked = value,
+                            onCheckedChange = { ref.child(key).setValue(it) })
+                        decor = if (value) {
                             TextDecoration.LineThrough
-                        } else{
+                        } else {
                             TextDecoration.None
                         }
-                        Text(element, textDecoration = decor, textAlign = TextAlign.Center, fontSize = 20.sp)
+                        Text(
+                            key,
+                            textDecoration = decor,
+                            textAlign = TextAlign.Center,
+                            fontSize = 20.sp
+                        )
                     }
                 }
             }
