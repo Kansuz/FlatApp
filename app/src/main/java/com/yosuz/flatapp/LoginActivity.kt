@@ -2,6 +2,7 @@ package com.yosuz.flatapp
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -58,12 +59,22 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.tasks.Task
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.database
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.yosuz.flatapp.data.LoginUIEvent
 import com.yosuz.flatapp.data.LoginViewModel
 import com.yosuz.flatapp.data.SignupViewModel
 import com.yosuz.flatapp.data.SignupUIEvent
+import java.time.LocalDate
+import java.time.Period
+import java.time.format.DateTimeFormatter
 
 class LoginActivity : ComponentActivity() {
+
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,6 +87,7 @@ class LoginActivity : ComponentActivity() {
             }
         }
     }
+
 }
 
 @Composable
@@ -202,7 +214,7 @@ fun ClickableTextComponent(initialText: String, clickableText: String, navContro
         }
     }
     ClickableText(text = annotatedString,
-        onClick = { navController.navigate(screen)})
+        onClick = {navController.navigate(screen)})
 
 }
 @Composable
