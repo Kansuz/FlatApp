@@ -43,6 +43,7 @@ import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -70,6 +72,8 @@ import com.yosuz.flatapp.data.RegistrationUIState
 import com.yosuz.flatapp.navigation.FlatAppRouter
 import com.yosuz.flatapp.navigation.Screen
 import com.yosuz.flatapp.ui.theme.FlatAppTheme
+
+
 
 @Composable
 fun UpperBar(modifier: Modifier = Modifier) {
@@ -364,7 +368,52 @@ fun MyChores(modifier: Modifier = Modifier) {
 //imageVector = Icons.Default.Delete -> Trash
 //imageVector = Icons.Default.CleaningServices -> Floor
 
+@Composable
+fun TextFieldWithButton(buttonText: String,onButtonClick: (String) -> Unit) {
+    var text by remember { mutableStateOf("") }
 
+    Row(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        TextField(
+            value = text,
+            onValueChange = { text = it },
+            label = { Text("Enter text") },
+            modifier = Modifier.weight(1f)
+        )
+        Button(
+            onClick = { onButtonClick(text) },
+            modifier = Modifier.alignByBaseline()
+        ) {
+            Text(buttonText)
+        }
+    }
+}
+
+fun addShoppingItem(item: String)
+{
+    if(item.trim()!="")
+    {
+        val db = Firebase.database.reference
+        val ref = db.child("shopping-list").child(item).setValue(false).addOnCompleteListener{
+            if(it.isSuccessful)
+            {
+                Log.i("firebase","Added item")
+            }
+            else
+            {
+                Log.e("firebase","Couldn't add item")
+            }
+        }
+
+    }
+
+
+
+}
 
 @Composable
 fun ShoppingList(modifier: Modifier = Modifier) {
@@ -427,6 +476,7 @@ fun ShoppingList(modifier: Modifier = Modifier) {
                     .padding(top = 75.dp, bottom = 20.dp)
                     .padding(horizontal = 25.dp)
             ) {
+                TextFieldWithButton("Add item",onButtonClick = ::addShoppingItem)
                 for ((key, value) in items.value) {
                     //Text(text = "$key: $value", fontSize = 20.sp)
 //                    val checkedState = remember { mutableStateOf(false) }
@@ -453,8 +503,10 @@ fun ShoppingList(modifier: Modifier = Modifier) {
     }
 }
 
+
 @Composable
 fun FriendList(modifier: Modifier = Modifier){
+
     val users = listOf("Alex", "Kuba", "Kamila")
     val icons = listOf(
         Icons.Default.Countertops, Icons.Default.Bathtub,
@@ -518,6 +570,8 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         }
     }
 }
+
+
 
 @Composable
 fun Menu(modifier: Modifier = Modifier, name: String, email: String, signupViewModel: SignupViewModel = viewModel() ){
