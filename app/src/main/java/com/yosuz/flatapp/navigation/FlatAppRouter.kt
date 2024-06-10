@@ -7,6 +7,7 @@ sealed class Screen{
     object LoginScreen : Screen()
     object HomeScreen : Screen()
     object MapScreen : Screen()
+    object AnimationScreen: Screen()
 }
 
 object FlatAppRouter {

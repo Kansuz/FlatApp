@@ -65,8 +65,12 @@ class MainActivity : ComponentActivity() {
                             MapScreenWithBarHorizontal()
                         }
                     }
+                    is Screen.AnimationScreen -> {
+                        AnimationScreen()
+                    }
                 }
             }
+
             //MapScreen()
 //            if (orientation == Configuration.ORIENTATION_PORTRAIT){
 //                FlatAppPortrait()
@@ -77,8 +81,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-
 
 
 

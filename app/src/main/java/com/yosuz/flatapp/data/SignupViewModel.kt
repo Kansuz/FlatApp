@@ -125,8 +125,8 @@ class SignupViewModel : ViewModel() {
                                         database.child("chores-count").setValue(0)
                                     }
                                     Log.i("firebase","Registered successfully")
-                                    FlatAppRouter.navigateTo(Screen.HomeScreen)
-
+                                    //FlatAppRouter.navigateTo(Screen.HomeScreen)
+                                    FlatAppRouter.navigateTo(Screen.AnimationScreen)
                                 }
                                 else
                                 {

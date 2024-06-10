@@ -55,7 +55,8 @@ class LoginViewModel: ViewModel() {
                 Log.d(TAG, "${it.isSuccessful}")
 
                 if(it.isSuccessful){
-                    FlatAppRouter.navigateTo(Screen.HomeScreen)
+                    //FlatAppRouter.navigateTo(Screen.HomeScreen)
+                    FlatAppRouter.navigateTo(Screen.AnimationScreen)
                 }
             }
             .addOnFailureListener {

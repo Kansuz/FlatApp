@@ -152,8 +152,8 @@ fun UpperBar(modifier: Modifier = Modifier) {
         Dialog(onDismissRequest = { showMenu.value = false}){
             Box {
                 Menu(modifier = Modifier,
-                    name = usr_name.value, //nie działa TODO
-                    email = usr_email.value) //nie działa TODO
+                    name = usr_name.value,
+                    email = usr_email.value)
             }
         }
     }

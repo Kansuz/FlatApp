@@ -212,7 +212,7 @@ fun ClickableTextComponent(initialText: String, clickableText: String, navContro
 fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = viewModel()){
     Surface(modifier = Modifier
         .fillMaxSize()
-        .background(Color.White)){
+        .background(color = MaterialTheme.colorScheme.surface)){
         Column (modifier = Modifier.padding(40.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             )
