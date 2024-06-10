@@ -1,7 +1,6 @@
 package com.yosuz.flatapp.components
 
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,19 +17,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bathtub
-import androidx.compose.material.icons.filled.SentimentSatisfied
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.CleaningServices
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Countertops
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Diversity3
 import androidx.compose.material.icons.filled.DoNotDisturbOn
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Person
@@ -65,14 +62,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.GenericTypeIndicator
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.yosuz.flatapp.based.User
 import com.yosuz.flatapp.data.SignupViewModel
-import com.yosuz.flatapp.data.RegistrationUIState
 import com.yosuz.flatapp.navigation.FlatAppRouter
 import com.yosuz.flatapp.navigation.Screen
 import com.yosuz.flatapp.ui.theme.FlatAppTheme
@@ -127,7 +122,7 @@ fun UpperBar(modifier: Modifier = Modifier) {
         }
     }
 
-    val registrationUIState = remember {mutableStateOf(RegistrationUIState())} //?? TODO
+    //val registrationUIState = remember {mutableStateOf(RegistrationUIState())} //?? TODO
 
     if (showMenu.value){
         val usr_name = remember { mutableStateOf<String>("Placeholder") }
@@ -222,7 +217,7 @@ fun BottomNavigation(modifier: Modifier = Modifier) {
                 )
             },
             selected = false,
-            onClick = {FlatAppRouter.navigateTo(Screen.HomeScreen)} //nie jestem jeszcze pewna czy działa, okaże się, jak będą mapy
+            onClick = {FlatAppRouter.navigateTo(Screen.HomeScreen)}
         )
         NavigationBarItem(
             icon = {
@@ -237,23 +232,23 @@ fun BottomNavigation(modifier: Modifier = Modifier) {
                 )
             },
             selected = false,
-            onClick = {}
+            onClick = {FlatAppRouter.navigateTo(Screen.MapScreen)}
         )
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = null
-                )
-            },
-            label = {
-                Text(
-                    text = "Invite"
-                )
-            },
-            selected = false,
-            onClick = {}
-        )
+//        NavigationBarItem(
+//            icon = {
+//                Icon(
+//                    imageVector = Icons.Default.LocationOn,
+//                    contentDescription = null
+//                )
+//            },
+//            label = {
+//                Text(
+//                    text = "Invite"
+//                )
+//            },
+//            selected = false,
+//            onClick = {}
+//        )
         if(status.intValue==0)
         {
             NavigationBarItem(
@@ -296,6 +291,7 @@ fun BottomNavigation(modifier: Modifier = Modifier) {
 @Composable
 fun BottomNavigationHorizontal(modifier: Modifier = Modifier) {
     val showFriends =  remember { mutableStateOf(false) }
+    val showMenu =  remember { mutableStateOf(false) }
     val status = remember { mutableIntStateOf(0) }
     val db = Firebase.database.reference
     val uid = Firebase.auth.uid
@@ -320,7 +316,7 @@ fun BottomNavigationHorizontal(modifier: Modifier = Modifier) {
 
     NavigationRail(
         modifier = modifier
-            .padding(start = 8.dp, end = 8.dp)
+            //.padding(start = 8.dp, end = 8.dp)
             .verticalScroll(rememberScrollState()),
         containerColor = MaterialTheme.colorScheme.surfaceVariant,
     ){
@@ -358,25 +354,25 @@ fun BottomNavigationHorizontal(modifier: Modifier = Modifier) {
                     )
                 },
                 selected = false,
-                onClick = {}
+                onClick = {FlatAppRouter.navigateTo(Screen.MapScreen)}
             )
             Spacer(modifier = Modifier.height(25.dp))
-            NavigationRailItem(
-                icon = {
-                    Icon (
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = null
-                    )
-                },
-                label = {
-                    Text(
-                        text = "Invite"
-                    )
-                },
-                selected = false,
-                onClick = {}
-            )
-            Spacer(modifier = Modifier.height(25.dp))
+//            NavigationRailItem(
+//                icon = {
+//                    Icon (
+//                        imageVector = Icons.Default.LocationOn,
+//                        contentDescription = null
+//                    )
+//                },
+//                label = {
+//                    Text(
+//                        text = "Invite"
+//                    )
+//                },
+//                selected = false,
+//                onClick = {}
+//            )
+//            Spacer(modifier = Modifier.height(25.dp))
             if(status.intValue == 1)
             {
                 NavigationRailItem(
@@ -437,7 +433,10 @@ fun BottomNavigationHorizontal(modifier: Modifier = Modifier) {
                 icon = {
                     Icon (
                         imageVector = Icons.Default.Menu,
-                        contentDescription = null
+                        contentDescription = null,
+                        modifier = Modifier.clickable{
+                            showMenu.value = !showMenu.value
+                        }
                     )
                 },
                 label = {
@@ -455,6 +454,40 @@ fun BottomNavigationHorizontal(modifier: Modifier = Modifier) {
         Dialog(onDismissRequest = { showFriends.value = false}){
             Box {
                 FriendList()
+            }
+        }
+    }
+
+    if (showMenu.value){
+        val usr_name = remember { mutableStateOf<String>("Placeholder") }
+        val usr_email = remember { mutableStateOf<String>("Placeholder") }
+        val db = Firebase.database.reference
+        val uid = Firebase.auth.uid
+        Log.i("firebase","Uid: ${uid}")
+        val myRef = db.child("users").child(uid.toString())
+        myRef.addValueEventListener(object : ValueEventListener {
+
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val data = dataSnapshot.getValue(object :
+                    GenericTypeIndicator<User>() {})
+                if (data != null) {
+                    usr_name.value = data.name.toString()
+                    usr_email.value = data.email.toString()
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("Error", "Error $error")
+            }
+
+
+        })
+
+        Dialog(onDismissRequest = { showMenu.value = false}){
+            Box {
+                Menu(modifier = Modifier,
+                    name = usr_name.value,
+                    email = usr_email.value)
             }
         }
     }
@@ -494,7 +527,7 @@ fun MyChores(modifier: Modifier = Modifier) {
 
     Surface(
         shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.surfaceVariant,
+        color = MaterialTheme.colorScheme.secondaryContainer,
         modifier = modifier.padding(vertical = 8.dp, horizontal = 8.dp))
     {
         Row(modifier = Modifier
@@ -538,7 +571,10 @@ fun TextFieldWithButton(buttonText: String,onButtonClick: (String) -> Unit) {
             modifier = Modifier.weight(1f)
         )
         Button(
-            onClick = { onButtonClick(text) },
+            onClick = {
+                onButtonClick(text)
+                text = ""
+            },
             modifier = Modifier.alignByBaseline()
         ) {
             Text(buttonText)
@@ -561,11 +597,24 @@ fun addShoppingItem(item: String)
                 Log.e("firebase","Couldn't add item")
             }
         }
-
     }
+}
 
-
-
+fun deleteShoppingItem(item: String){
+    if(item.trim()!="")
+    {
+        val db = Firebase.database.reference
+        val ref = db.child("shopping-list").child(item).removeValue().addOnCompleteListener{
+            if(it.isSuccessful)
+            {
+                Log.i("firebase","Added item")
+            }
+            else
+            {
+                Log.e("firebase","Couldn't add item")
+            }
+        }
+    }
 }
 
 @Composable
@@ -578,7 +627,7 @@ fun ShoppingList(modifier: Modifier = Modifier) {
 
     Surface(
         shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.surfaceVariant,
+        color = MaterialTheme.colorScheme.secondaryContainer,
         modifier = modifier
             .padding(vertical = 8.dp, horizontal = 8.dp)
             .clickable { expanded = !expanded })
@@ -649,6 +698,15 @@ fun ShoppingList(modifier: Modifier = Modifier) {
                             textAlign = TextAlign.Center,
                             fontSize = 20.sp
                         )
+                        Row(
+                            horizontalArrangement = Arrangement.End,
+                            modifier = Modifier.fillMaxWidth()
+                        ){
+                            Icon(
+                                modifier = Modifier.clickable { deleteShoppingItem(key) },
+                                imageVector = Icons.Filled.Clear,
+                                contentDescription = null)
+                        }
                     }
                 }
             }
@@ -823,7 +881,7 @@ fun Menu(modifier: Modifier = Modifier, name: String, email: String, signupViewM
                     onClick = { signupViewModel.logout() },
                     modifier = Modifier
                         //.fillMaxWidth()
-                        .padding(top = 5.dp)
+                        .padding(horizontal = 30.dp, vertical = 5.dp)
                         .heightIn(40.dp),
                     contentPadding = PaddingValues(),
                     //colors = ButtonDefaults.buttonColors(Color.Transparent),
@@ -832,11 +890,11 @@ fun Menu(modifier: Modifier = Modifier, name: String, email: String, signupViewM
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(30.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.secondary,
-                                shape = RoundedCornerShape(50.dp)
-                            ),
+                            .heightIn(30.dp),
+//                            .background(
+//                                color = MaterialTheme.colorScheme.secondary,
+//                                shape = RoundedCornerShape(50.dp)
+//                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(

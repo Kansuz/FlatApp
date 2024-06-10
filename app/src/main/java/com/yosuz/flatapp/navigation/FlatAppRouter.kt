@@ -10,7 +10,7 @@ sealed class Screen{
 }
 
 object FlatAppRouter {
-    var currentScreen: MutableState<Screen> = mutableStateOf(Screen.HomeScreen) //zmień na loginscren!
+    var currentScreen: MutableState<Screen> = mutableStateOf(Screen.LoginScreen)
 
     fun navigateTo(destination: Screen){
         currentScreen.value = destination

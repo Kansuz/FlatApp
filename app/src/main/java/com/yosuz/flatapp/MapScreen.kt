@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -18,11 +17,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -35,6 +32,7 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.yosuz.flatapp.components.BottomNavigation
 import com.yosuz.flatapp.components.BottomNavigationHorizontal
+import com.yosuz.flatapp.ui.theme.FlatAppTheme
 import kotlinx.coroutines.launch
 
 @SuppressLint("MissingPermission")
@@ -93,39 +91,31 @@ fun MapScreen() {
             },
         ) {
         }
-        Column(modifier = Modifier
-            .align(Alignment.TopCenter)
-            .padding(16.dp)) {
-//            Switch(
-//                modifier = Modifier.padding(top = 8.dp),
-//                checked = uiSettings.zoomControlsEnabled,
-//                onCheckedChange = {
-//                    uiSettings = uiSettings.copy(zoomControlsEnabled = it)
-//                }
-//            )
-        }
-        //BottomNavigation()
     }
 }
 
 @Composable
 fun MapScreenWithBar(){
-    Scaffold(
-        //topBar = { UpperBar() },
-        bottomBar = { BottomNavigation() }
-    ) { padding ->
-        Column(modifier = Modifier.consumeWindowInsets(padding)){
-            MapScreen()
+    FlatAppTheme{
+        Scaffold(
+            //topBar = { UpperBar() },
+            bottomBar = { BottomNavigation() }
+        ) { padding ->
+            Column(modifier = Modifier.consumeWindowInsets(padding)){
+                MapScreen()
+            }
         }
     }
 }
 
 @Composable
 fun MapScreenWithBarHorizontal(){
-    Surface (color = MaterialTheme.colorScheme.background){
-        Row(modifier = Modifier.fillMaxSize()){
-            BottomNavigationHorizontal()
-            MapScreen()
+    FlatAppTheme{
+        Surface (color = MaterialTheme.colorScheme.surface){
+            Row(modifier = Modifier.fillMaxSize()){
+                BottomNavigationHorizontal()
+                MapScreen()
+            }
         }
     }
 }
@@ -133,5 +123,7 @@ fun MapScreenWithBarHorizontal(){
 @Preview
 @Composable
 fun MapScreenWithBarPreview(){
-    MapScreenWithBar()
+    FlatAppTheme {
+        MapScreenWithBar()
+    }
 }
