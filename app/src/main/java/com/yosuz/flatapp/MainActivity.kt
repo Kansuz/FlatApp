@@ -1,34 +1,30 @@
 package com.yosuz.flatapp
 
-import android.content.res.Configuration
-import android.os.Bundle
-import android.util.Log
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.animation.Crossfade
 //import androidx.compose.foundation.layout.FlowRowScopeInstance.weight
 //import androidx.compose.foundation.layout.FlowRowScopeInstance.align
 //import androidx.compose.foundation.layout.FlowRowScopeInstance.weight
+import android.content.res.Configuration
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.yosuz.flatapp.ui.theme.FlatAppTheme
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import com.yosuz.flatapp.components.BottomNavigation
 import com.yosuz.flatapp.components.BottomNavigationHorizontal
-import com.yosuz.flatapp.navigation.FlatAppRouter
-import com.yosuz.flatapp.navigation.Screen
 import com.yosuz.flatapp.components.HomeScreen
 import com.yosuz.flatapp.components.UpperBar
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
+import com.yosuz.flatapp.navigation.FlatAppRouter
+import com.yosuz.flatapp.navigation.Screen
+import com.yosuz.flatapp.ui.theme.FlatAppTheme
 
 
 class MainActivity : ComponentActivity() {
@@ -62,8 +58,16 @@ class MainActivity : ComponentActivity() {
                             FlatAppLandscape()
                         }
                     }
+                    is Screen.MapScreen -> {
+                        if(orientationPortrait){
+                            MapScreenWithBar()
+                        } else {
+                            MapScreenWithBarHorizontal()
+                        }
+                    }
                 }
             }
+            //MapScreen()
 //            if (orientation == Configuration.ORIENTATION_PORTRAIT){
 //                FlatAppPortrait()
 //            }
