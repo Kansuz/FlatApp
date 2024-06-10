@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bathtub
+import androidx.compose.material.icons.filled.SentimentSatisfied
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.CleaningServices
 import androidx.compose.material.icons.filled.Countertops
@@ -33,6 +34,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.SentimentSatisfiedAlt
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
@@ -162,8 +164,46 @@ fun UpperBar(modifier: Modifier = Modifier) {
     }
 }
 
+
+
+
+fun changeBusy(status: Int)
+{
+    val db = Firebase.database.reference
+    val uid = Firebase.auth.uid
+
+    val myRef = db.child("users").child(uid.toString())
+    if(status == 1)
+        myRef.child("status").setValue(0)
+    else
+        myRef.child("status").setValue(1)
+
+}
+
 @Composable
 fun BottomNavigation(modifier: Modifier = Modifier) {
+
+    val status = remember { mutableIntStateOf(0) }
+    val db = Firebase.database.reference
+    val uid = Firebase.auth.uid
+
+    val myRef = db.child("users").child(uid.toString())
+    myRef.addValueEventListener(object : ValueEventListener {
+
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+            val data = dataSnapshot.getValue(object :
+                GenericTypeIndicator<User>() {})
+            if (data != null) {
+                status.intValue = data.status
+            }
+        }
+
+        override fun onCancelled(error: DatabaseError) {
+            Log.e("Error", "Error $error")
+        }
+
+
+    })
 
     NavigationBar(
         modifier = modifier,
@@ -214,27 +254,69 @@ fun BottomNavigation(modifier: Modifier = Modifier) {
             selected = false,
             onClick = {}
         )
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.DoNotDisturbOn,
-                    contentDescription = null
-                )
-            },
-            label = {
-                Text(
-                    text = "Busy"
-                )
-            },
-            selected = false,
-            onClick = {}
-        )
+        if(status.intValue==0)
+        {
+            NavigationBarItem(
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.DoNotDisturbOn,
+                        contentDescription = null
+                    )
+                },
+                label = {
+                    Text(
+                        text = "Busy"
+                    )
+                },
+                selected = false,
+                onClick = {changeBusy(status.intValue)}
+            )
+        }
+        else
+        {
+            NavigationBarItem(
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.SentimentSatisfiedAlt,
+                        contentDescription = null
+                    )
+                },
+                label = {
+                    Text(
+                        text = "Free"
+                    )
+                },
+                selected = false,
+                onClick = {changeBusy(status.intValue)}
+            )
+        }
     }
 }
 
 @Composable
 fun BottomNavigationHorizontal(modifier: Modifier = Modifier) {
     val showFriends =  remember { mutableStateOf(false) }
+    val status = remember { mutableIntStateOf(0) }
+    val db = Firebase.database.reference
+    val uid = Firebase.auth.uid
+
+    val myRef = db.child("users").child(uid.toString())
+    myRef.addValueEventListener(object : ValueEventListener {
+
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+            val data = dataSnapshot.getValue(object :
+                GenericTypeIndicator<User>() {})
+            if (data != null) {
+                status.intValue = data.status
+            }
+        }
+
+        override fun onCancelled(error: DatabaseError) {
+            Log.e("Error", "Error $error")
+        }
+
+
+    })
 
     NavigationRail(
         modifier = modifier
@@ -295,21 +377,42 @@ fun BottomNavigationHorizontal(modifier: Modifier = Modifier) {
                 onClick = {}
             )
             Spacer(modifier = Modifier.height(25.dp))
-            NavigationRailItem(
-                icon = {
-                    Icon (
-                        imageVector = Icons.Default.DoNotDisturbOn,
-                        contentDescription = null
-                    )
-                },
-                label = {
-                    Text(
-                        text = "Busy"
-                    )
-                },
-                selected = false,
-                onClick = {}
-            )
+            if(status.intValue == 1)
+            {
+                NavigationRailItem(
+                    icon = {
+                        Icon (
+                            imageVector = Icons.Default.SentimentSatisfiedAlt,
+                            contentDescription = null
+                        )
+                    },
+                    label = {
+                        Text(
+                            text = "Busy"
+                        )
+                    },
+                    selected = false,
+                    onClick = { changeBusy(status.intValue)}
+                )
+            }
+            else
+            {
+                NavigationRailItem(
+                    icon = {
+                        Icon (
+                            imageVector = Icons.Default.DoNotDisturbOn,
+                            contentDescription = null
+                        )
+                    },
+                    label = {
+                        Text(
+                            text = "Busy"
+                        )
+                    },
+                    selected = false,
+                    onClick = {changeBusy(status.intValue)}
+                )
+            }
             Spacer(modifier = Modifier.height(25.dp))
             NavigationRailItem(
                 icon = {
@@ -377,7 +480,6 @@ fun MyChores(modifier: Modifier = Modifier) {
             if (data != null) {
                 var days = ChronoUnit.DAYS.between(LocalDate.parse("01.06.2024", DateTimeFormatter.ofPattern("dd.MM.yyyy")),LocalDate.now())
                 myChore.value = ((data.chore + days) % 4).toInt()
-                Log.i("firebase","??? ${myChore.value}  ${days.toInt() % 4} ")
 
             }
         }
@@ -556,6 +658,26 @@ fun ShoppingList(modifier: Modifier = Modifier) {
 
 
 @Composable
+fun FriendBusy()
+{
+    Icon(
+        //modifier = Modifier.size(55.dp),
+        imageVector = Icons.Default.DoNotDisturbOn,
+        contentDescription = null
+    )
+}
+
+@Composable
+fun FriendFree()
+{
+    Icon(
+        //modifier = Modifier.size(55.dp),
+        imageVector = Icons.Default.SentimentSatisfiedAlt,
+        contentDescription = null
+    )
+}
+
+@Composable
 fun Friend(usr:User,modifier: Modifier = Modifier)
 {
     var days = ChronoUnit.DAYS.between(LocalDate.parse("01.06.2024", DateTimeFormatter.ofPattern("dd.MM.yyyy")),LocalDate.now())
@@ -564,11 +686,11 @@ fun Friend(usr:User,modifier: Modifier = Modifier)
         modifier = Modifier.padding(24.dp),
         verticalAlignment = Alignment.CenterVertically
     ){
-        Icon(
-            //modifier = Modifier.size(55.dp),
-            imageVector = Icons.Default.DoNotDisturbOn,
-            contentDescription = null
-        )
+        when(usr.status)
+        {
+            0-> FriendBusy()
+            1-> FriendFree()
+        }
         Spacer(Modifier.width(10.dp))
 
         Text(modifier = Modifier
