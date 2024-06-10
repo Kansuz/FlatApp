@@ -46,6 +46,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -67,12 +68,15 @@ import com.google.firebase.database.GenericTypeIndicator
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.yosuz.flatapp.based.User
 import com.yosuz.flatapp.data.SignupViewModel
 import com.yosuz.flatapp.data.RegistrationUIState
 import com.yosuz.flatapp.navigation.FlatAppRouter
 import com.yosuz.flatapp.navigation.Screen
 import com.yosuz.flatapp.ui.theme.FlatAppTheme
-
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 
 @Composable
@@ -124,11 +128,35 @@ fun UpperBar(modifier: Modifier = Modifier) {
     val registrationUIState = remember {mutableStateOf(RegistrationUIState())} //?? TODO
 
     if (showMenu.value){
+        val usr_name = remember { mutableStateOf<String>("Placeholder") }
+        val usr_email = remember { mutableStateOf<String>("Placeholder") }
+        val db = Firebase.database.reference
+        val uid = Firebase.auth.uid
+        Log.i("firebase","Uid: ${uid}")
+        val myRef = db.child("users").child(uid.toString())
+        myRef.addValueEventListener(object : ValueEventListener {
+
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val data = dataSnapshot.getValue(object :
+                    GenericTypeIndicator<User>() {})
+                if (data != null) {
+                    usr_name.value = data.name.toString()
+                    usr_email.value = data.email.toString()
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("Error", "Error $error")
+            }
+
+
+        })
+
         Dialog(onDismissRequest = { showMenu.value = false}){
             Box {
                 Menu(modifier = Modifier,
-                    name = registrationUIState.value.name, //nie działa TODO
-                    email = registrationUIState.value.email) //nie działa TODO
+                    name = usr_name.value, //nie działa TODO
+                    email = usr_email.value) //nie działa TODO
             }
         }
     }
@@ -329,10 +357,39 @@ fun BottomNavigationHorizontal(modifier: Modifier = Modifier) {
     }
 }
 
+
+
 @Composable
 fun MyChores(modifier: Modifier = Modifier) {
     val expanded = remember { mutableStateOf(false) }
     //val extraPadding = if (expanded.value) 48.dp else 0.dp
+    val myChore = remember{ mutableIntStateOf(0) }
+
+    val db = Firebase.database.reference
+    val uid = Firebase.auth.uid
+    Log.i("firebase","Uid: ${uid}")
+    val myRef = db.child("users").child(uid.toString())
+    myRef.addValueEventListener(object : ValueEventListener {
+
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+            val data = dataSnapshot.getValue(object :
+                GenericTypeIndicator<User>() {})
+            if (data != null) {
+                var days = ChronoUnit.DAYS.between(LocalDate.parse("01.06.2024", DateTimeFormatter.ofPattern("dd.MM.yyyy")),LocalDate.now())
+                myChore.value = ((data.chore + days) % 4).toInt()
+                Log.i("firebase","??? ${myChore.value}  ${days.toInt() % 4} ")
+
+            }
+        }
+
+        override fun onCancelled(error: DatabaseError) {
+            Log.e("Error", "Error $error")
+        }
+
+
+    })
+
+
     Surface(
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -346,18 +403,12 @@ fun MyChores(modifier: Modifier = Modifier) {
             Text(modifier = Modifier.weight(1f),
                 text = "Chores",
                 style = MaterialTheme.typography.titleLarge)
-            Column(modifier = Modifier,
-                //.padding(bottom = extraPadding),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ){
-                Icon(
-                    modifier = Modifier.size(40.dp),
-                    imageVector = Icons.Default.Countertops,
-                    contentDescription = null
-                )
-                Text(
-                    text = "Kitchen",
-                    style = MaterialTheme.typography.titleMedium)
+            when(myChore.value)
+            {
+                0 -> Kitchen()
+                1 -> Bathroom()
+                2 -> Trash()
+                3 -> Floor()
             }
         }
     }
@@ -421,7 +472,7 @@ fun ShoppingList(modifier: Modifier = Modifier) {
 
 
     //val extraPadding = if (expanded.value) 48.dp else 0.dp
-    //val users = listOf("Szampon", "Chleb", "Sok")
+
 
     Surface(
         shape = MaterialTheme.shapes.medium,
@@ -505,12 +556,74 @@ fun ShoppingList(modifier: Modifier = Modifier) {
 
 
 @Composable
+fun Friend(usr:User,modifier: Modifier = Modifier)
+{
+    var days = ChronoUnit.DAYS.between(LocalDate.parse("01.06.2024", DateTimeFormatter.ofPattern("dd.MM.yyyy")),LocalDate.now())
+    var myChore = ((usr.chore + days) % 4).toInt()
+    Row(
+        modifier = Modifier.padding(24.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        Icon(
+            //modifier = Modifier.size(55.dp),
+            imageVector = Icons.Default.DoNotDisturbOn,
+            contentDescription = null
+        )
+        Spacer(Modifier.width(10.dp))
+
+        Text(modifier = Modifier
+            .weight(1f),
+            text = usr.name.toString(),
+            style = MaterialTheme.typography.titleLarge)
+
+        Column(modifier = Modifier,
+            //.padding(bottom = extraPadding),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            when(myChore)
+            {
+                0 -> Kitchen()
+                1 -> Bathroom()
+                2 -> Trash()
+                3 -> Floor()
+            }
+        }
+    }
+}
+
+@Composable
 fun FriendList(modifier: Modifier = Modifier){
 
-    val users = listOf("Alex", "Kuba", "Kamila")
+    val users = remember { mutableStateOf<Map<String, User>>(emptyMap()) }
+//    val users = listOf("Alex", "Kuba", "Kamila")
     val icons = listOf(
         Icons.Default.Countertops, Icons.Default.Bathtub,
         Icons.Default.Delete, Icons.Default.CleaningServices )
+
+    val db = Firebase.database.reference
+    val uid = Firebase.auth.uid
+    Log.i("firebase","Uid: ${uid}")
+    val myRef = db.child("users")
+    myRef.addValueEventListener(object : ValueEventListener {
+
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+            val data = dataSnapshot.getValue(object :
+                GenericTypeIndicator<Map<String, User>>() {})
+            if (data != null) {
+
+                users.value = data
+
+
+            }
+        }
+
+        override fun onCancelled(error: DatabaseError) {
+            Log.e("Error", "Error $error")
+        }
+
+
+    })
+
 
     Surface(
         shape = MaterialTheme.shapes.medium,
@@ -519,38 +632,11 @@ fun FriendList(modifier: Modifier = Modifier){
             .padding(vertical = 8.dp, horizontal = 8.dp))
     {
         LazyColumn(){
-            for(element in users){
+            for((key, value) in users.value){
+                if(key == uid)
+                    continue
                 item{
-                    Row(
-                        modifier = Modifier.padding(24.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ){
-                        Icon(
-                            //modifier = Modifier.size(55.dp),
-                            imageVector = Icons.Default.DoNotDisturbOn,
-                            contentDescription = null
-                        )
-                        Spacer(Modifier.width(10.dp))
-
-                        Text(modifier = Modifier
-                            .weight(1f),
-                            text = element,
-                            style = MaterialTheme.typography.titleLarge)
-
-                        Column(modifier = Modifier,
-                            //.padding(bottom = extraPadding),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ){
-                            Icon(
-                                modifier = Modifier.size(40.dp),
-                                imageVector = Icons.Default.Bathtub,
-                                contentDescription = null
-                            )
-                            Text(
-                                text = "Bathroom",
-                                style = MaterialTheme.typography.titleMedium)
-                        }
-                    }
+                    Friend(value)
                 }
             }
         }
